@@ -77,6 +77,26 @@ tr:last-child td{border-bottom:0}
 .chip.pronto{background:var(--ambar-suave);color:var(--ambar)}
 .chip.gris{background:var(--linea);color:var(--gris)}
 
+/* número grande del panel */
+.card.destacado{padding:18px 16px}
+.card.destacado .lbl{font-size:13px;color:var(--gris)}
+.card.destacado .grande{font-size:38px;font-weight:650;letter-spacing:-.03em;line-height:1.1;margin-top:2px}
+.card.destacado .sub-grande{font-size:13px;color:var(--gris);margin-top:4px}
+.progreso{height:12px;background:#EEF1F0;border-radius:99px;overflow:hidden;margin-top:16px;display:flex}
+.progreso i.hecho{display:block;height:100%;background:var(--verde);border-radius:99px}
+.progreso-pie{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--gris);margin-top:6px}
+
+.ref-colores{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--gris);margin-bottom:12px}
+.ref-colores span{display:flex;align-items:center;gap:5px}
+.ref-colores b{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+.rubro{padding:12px 0;border-bottom:1px solid var(--linea)}
+.rubro:last-of-type{border-bottom:0}
+.rubro-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.rubro-nom{font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rubro-tot{font-size:15px;font-weight:650;white-space:nowrap}
+.rubro-pie{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--gris);margin-top:5px;flex-wrap:wrap}
+
 .cmp{padding:11px 0;border-bottom:1px solid var(--linea)}
 .cmp:last-child{border-bottom:0}
 .cmp-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}

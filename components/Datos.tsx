@@ -85,7 +85,10 @@ export type ResumenRubro = {
   pendARS: number; pendUSD: number;
   compUSD: number; compARS: number;
   desvUSD: number;
+  proyUSD: number; proyARS: number;
+  avance: number | null;
   sinPresupuesto: boolean;
+  sinGasto: boolean;
 };
 
 export function calcularPanel(
@@ -100,7 +103,8 @@ export function calcularPanel(
       mapa.set(id, {
         id, rubro: nombreRubro(rubros, id),
         presuARS: 0, presuUSD: 0, gastARS: 0, gastUSD: 0, pendARS: 0, pendUSD: 0,
-        compUSD: 0, compARS: 0, desvUSD: 0, sinPresupuesto: true,
+        compUSD: 0, compARS: 0, desvUSD: 0, proyUSD: 0, proyARS: 0,
+        avance: null, sinPresupuesto: true, sinGasto: true,
       });
     }
     return mapa.get(id)!;
@@ -137,9 +141,14 @@ export function calcularPanel(
     b.compARS = b.gastARS + b.pendARS;
     b.compUSD = b.gastUSD + b.pendUSD;
     b.sinPresupuesto = b.presuUSD <= 0;
+    b.sinGasto = b.gastUSD <= 0;
     b.desvUSD = b.presuUSD > 0 ? b.compUSD - b.presuUSD : 0;
+    // Lo que va a costar el rubro: el presupuesto, o lo ya comprometido si se pasó
+    b.proyUSD = Math.max(b.presuUSD, b.compUSD);
+    b.proyARS = Math.max(b.presuARS, b.compARS);
+    b.avance = b.proyUSD > 0 ? (b.gastUSD / b.proyUSD) * 100 : null;
     return b;
-  }).sort((a, b) => b.compUSD - a.compUSD);
+  }).sort((a, b) => b.proyUSD - a.proyUSD);
 
   const tot = lista.reduce(
     (a, b) => ({
@@ -153,6 +162,8 @@ export function calcularPanel(
   const compUSD = tot.gastUSD + tot.pendUSD;
   const compARS = tot.gastARS + tot.pendARS;
   const desvUSD = tot.presuUSD > 0 ? compUSD - tot.presuUSD : 0;
+  const proyUSD = lista.reduce((a, b) => a + b.proyUSD, 0);
+  const proyARS = lista.reduce((a, b) => a + b.proyARS, 0);
   const m2 = Number(config.m2_computados) || 0;
 
   let acum = 0;
@@ -165,10 +176,14 @@ export function calcularPanel(
     tc, m2, lista, curva,
     porTipo: [...porTipo.entries()].map(([tipo, u]) => ({ tipo, usd: u })).sort((a, b) => b.usd - a.usd),
     total: {
-      ...tot, compUSD, compARS, desvUSD,
+      ...tot, compUSD, compARS, desvUSD, proyUSD, proyARS,
       desvPct: tot.presuUSD > 0 ? (desvUSD / tot.presuUSD) * 100 : null,
+      avance: proyUSD > 0 ? (tot.gastUSD / proyUSD) * 100 : 0,
+      proyConContUSD: proyUSD * (1 + Number(config.contingencia_pct) / 100),
       presuConContUSD: tot.presuUSD * (1 + Number(config.contingencia_pct) / 100),
     },
+    m2Proyectado: { ars: m2 ? proyARS / m2 : 0, usd: m2 ? proyUSD / m2 : 0 },
+    sinPresupuesto: lista.filter((b) => b.sinPresupuesto && b.gastUSD > 0),
     cuotasPendientes: cuotas.filter((c) => c.estado === 'Pendiente').length,
     cuotasVencidas: vencidas,
     m2Gastado: { ars: m2 ? tot.gastARS / m2 : 0, usd: m2 ? tot.gastUSD / m2 : 0 },
